@@ -48,6 +48,7 @@
       "matchDepNames": ["openshift-rc"],
       "separateMinorPatch": true,
       "separateMajorMinor": true,
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-rc\\.(?<build>\\d+)-x86_64$",
       "prBodyNotes": ["2"]
     }
   ],
