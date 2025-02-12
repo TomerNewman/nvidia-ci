@@ -10,14 +10,27 @@
       "packageNameTemplate": "nvidia/gpu-operator",
       "depNameTemplate": "nvidia-gpu-operator",
       "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": ["gpu_operator_staging_digest:\\s*\"(?<currentValue>.*?)\""],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://registry.gitlab.com",
+      "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
+      "depNameTemplate": "nvidia-gpu-operator-staging",
+      "versioningTemplate": "docker",
+      "pinDigests": true
     }
   ],
-
   "packageRules": [
     {
       "matchDepNames": ["nvidia-gpu-operator"],
       "separateMinorPatch": true,
       "separateMajorMinor": true,
+      "prBodyNotes": ["/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"]
+    },
+    {
+      "matchDepNames": ["nvidia-gpu-operator-staging"],
       "prBodyNotes": ["/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"]
     }
   ],
