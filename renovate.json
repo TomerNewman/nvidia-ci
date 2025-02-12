@@ -2,25 +2,26 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "enabledManagers": ["regex"],
   "regexManagers": [
-    {
-      "fileMatch": ["^versions\\.yaml$"],
-      "matchStrings": ["gpu_operator_version:\\s*\"(?<currentValue>.*?)\""],
-      "datasourceTemplate": "docker",
-      "registryUrlTemplate": "https://nvcr.io",
-      "packageNameTemplate": "nvidia/gpu-operator",
-      "depNameTemplate": "nvidia-gpu-operator",
-      "versioningTemplate": "semver"
-    },
-    {
-      "fileMatch": ["^versions\\.yaml$"],
-      "matchStrings": ["gpu_operator_staging_digest:\\s*\"(?<currentDigest>.*?)\""],
-      "datasourceTemplate": "docker",
-      "registryUrlTemplate": "https://registry.gitlab.com",
-      "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
-      "depNameTemplate": "nvidia-gpu-operator-staging",
-      "versioningTemplate": "docker"
-    }
-  ],
+  {
+    "fileMatch": ["^versions\\.yaml$"],
+    "matchStrings": ["gpu_operator_version:\\s*\"(?<currentValue>.*?)\""],
+    "datasourceTemplate": "docker",
+    "registryUrlTemplate": "https://nvcr.io",
+    "packageNameTemplate": "nvidia/gpu-operator",
+    "depNameTemplate": "nvidia-gpu-operator",
+    "versioningTemplate": "semver"
+  },
+  {
+    "fileMatch": ["^versions\\.yaml$"],
+    "matchStrings": ["gpu_operator_staging_digest:\\s*\"(?<currentDigest>.*?)\""],
+    "datasourceTemplate": "docker",
+    "registryUrlTemplate": "https://registry.gitlab.com",
+    "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
+    "depNameTemplate": "nvidia-gpu-operator-staging",
+    "versioningTemplate": "docker",
+    "currentValueTemplate": "{{currentDigest}}"
+  }
+],
   "packageRules": [
     {
       "matchDepNames": ["nvidia-gpu-operator"],
