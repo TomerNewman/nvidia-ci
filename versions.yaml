@@ -1,2 +1,2 @@
-test: "123"
-gpu_operator_staging_digest: "sha256:abc123"
+gpu_operator_version: "23.9.1"
+gpu_operator_staging_digest: "sha256:3e44858b5597c61cb0f0ec1ac32f3cb66e7ecc1b1f1caf4b62ce40ed45c61cfd"
