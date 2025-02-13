@@ -9,6 +9,7 @@
       "registryUrlTemplate": "https://registry.gitlab.com",
       "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle:main-latest",
       "depNameTemplate": "nvidia-gpu-operator-staging",
+      "lookupNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
       "versioningTemplate": "docker",
       "currentValueTemplate": "{{currentDigest}}"
     }
