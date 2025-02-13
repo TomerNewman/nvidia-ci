@@ -1,24 +1,32 @@
 {
-  "enabledManagers": ["regex"],
-  "regexManagers": [
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": ["^versions\\.yaml$"],
       "matchStrings": [
-        "(?<prefix>gpu_operator_staging_digest:\\s*\")(?<currentValue>sha256:[0-9a-f]+)(?<suffix>\")"
+        "gpu_operator_staging_digest:\\s*\"(?<currentDigest>sha256:[a-f0-9]+)\""
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
-      "versioningTemplate": "regex",
-      "extractVersionTemplate": "^(?<version>sha256:[0-9a-f]+)$"
+      "currentDigest": "{{{currentDigest}}}",
+      "currentValue": "main-latest",
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
     {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle"
-      ],
-      "prBody": "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
+      "matchPackagePatterns": ["gpu-operator-bundle"],
+      "commitMessageExtra": "to {{newDigest}}",
+      "commitMessageTopic": "GPU Operator staging digest",
+      "prBodyNotes": [
+        "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
+      ]
     }
-  ]
+  ],
+  "enabledManagers": ["regex"],
+  "dependencyDashboard": true
 }
