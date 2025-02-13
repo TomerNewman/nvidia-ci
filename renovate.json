@@ -1,4 +1,5 @@
 {
+  "enabledManagers": ["regex"],
   "regexManagers": [
     {
       "fileMatch": ["^versions\\.yaml$"],
