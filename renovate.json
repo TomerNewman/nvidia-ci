@@ -3,13 +3,11 @@
     {
       "fileMatch": ["^versions\\.yaml$"],
       "matchStrings": [
-        "gpu_operator_staging_digest:\\s*\"?(?<currentValue>sha256:[0-9a-f]+)\"?"
+        "(?<prefix>gpu_operator_staging_digest:\\s*\")(?<currentValue>sha256:[0-9a-f]+)(?<suffix>\")"
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
-      "versioningTemplate": "docker",
-      "extractVersionTemplate": "^(?<digest>sha256:[0-9a-f]+)$",
-      "replacementTemplate": "gpu_operator_staging_digest: \"{{newVersion}}\""
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
