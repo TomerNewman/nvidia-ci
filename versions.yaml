@@ -1,4 +1,4 @@
 gpu_operator_version24.6: "24.6.0"
 gpu_operator_version24.9: "24.9.0"
 gpu_operator_version24.12: "24.9.0"
-gpu_operator_staging_digest: "sha256:3e44858b5597c61cb0f0ec1ac32f3cb66e7ecc1b1f1caf4b62ce40ed45c61cfd"
+gpu_operator_staging_digest: "sha256:c95ebeb28b3f48a4f8bd5df12aac170f2361804283d38ea12929f2e5127223d3"
