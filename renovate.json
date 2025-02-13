@@ -9,7 +9,7 @@
       "depNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
       "versioningTemplate": "docker",
       "extractVersionTemplate": "^(?<digest>sha256:[0-9a-f]+)$",
-      "replaceString": "gpu_operator_staging_digest: \"{{newVersion}}\""
+      "replacementTemplate": "gpu_operator_staging_digest: \"{{newVersion}}\""
     }
   ],
   "packageRules": [
