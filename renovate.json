@@ -8,13 +8,12 @@
       "customType": "regex",
       "fileMatch": ["^versions\\.yaml$"],
       "matchStrings": [
-        "gpu_operator_staging_digest:\\s*\"(?<currentDigest>sha256:[a-f0-9]+)\""
+        "gpu_operator_staging_digest:\\s*\"(?<currentDigest>sha256:[a-f0-9]+)\"\\s*"
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
-      "currentDigest": "{{{currentDigest}}}",
-      "currentValue": "main-latest",
-      "versioningTemplate": "docker"
+      "extractVersionTemplate": "(?<version>main-latest)",
+      "registryUrlTemplate": "https://registry.gitlab.com"
     }
   ],
   "packageRules": [
