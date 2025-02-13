@@ -10,15 +10,13 @@
       "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
       "depNameTemplate": "nvidia-gpu-operator-staging",
       "lookupNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle:main-latest",
-      "versioningTemplate": "docker",
-      "currentValueTemplate": "{{currentDigest}}"
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
     {
       "matchDepNames": ["nvidia-gpu-operator-staging"],
       "matchUpdateTypes": ["digest"],
-      "lookupNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle:main-latest",
       "digest": {
         "enabled": true
       },
