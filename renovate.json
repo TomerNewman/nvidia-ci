@@ -14,13 +14,58 @@
       "depNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
       "currentValueTemplate": "main-latest",
       "registryUrlTemplate": "https://registry.gitlab.com"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "gpu_operator_version24\\.6:\\s*\"(?<currentValue>24\\.6\\.[0-9]+)\"\\s*"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "nvcr.io/nvidia/gpu-operator",
+      "versioning": "semver",
+      "currentValueTemplate": "24.6.0",
+      "extractVersionTemplate": "^24\\.6\\.[0-9]+$"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "gpu_operator_version24\\.9:\\s*\"(?<currentValue>24\\.9\\.[0-9]+)\"\\s*"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "nvcr.io/nvidia/gpu-operator",
+      "versioning": "semver",
+      "currentValueTemplate": "24.9.0",
+      "extractVersionTemplate": "^24\\.9\\.[0-9]+$"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "gpu_operator_version24\\.12:\\s*\"(?<currentValue>24\\.12\\.[0-9]+)\"\\s*"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "nvcr.io/nvidia/gpu-operator",
+      "versioning": "semver",
+      "currentValueTemplate": "24.12.0",
+      "extractVersionTemplate": "^24\\.12\\.[0-9]+$"
     }
   ],
   "packageRules": [
     {
       "matchPackagePatterns": ["gpu-operator-bundle"],
       "commitMessageExtra": "to {{newDigest}}",
-      "commitMessageTopic": "GPU Operator bundle digest",
+      "commitMessageTopic": "GPU Operator staging digest",
+      "prBodyNotes": [
+        "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
+      ]
+    },
+    {
+      "matchPackagePatterns": ["nvcr.io/nvidia/gpu-operator"],
+      "matchUpdateTypes": ["patch"],
+      "commitMessageExtra": "to {{newVersion}}",
+      "commitMessageTopic": "GPU Operator version",
       "prBodyNotes": [
         "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
       ]
