@@ -23,9 +23,8 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "nvcr.io/nvidia/gpu-operator",
-      "versioning": "semver",
       "currentValueTemplate": "24.6.0",
-      "extractVersionTemplate": "^24\\.6\\.[0-9]+$"
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
@@ -35,9 +34,8 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "nvcr.io/nvidia/gpu-operator",
-      "versioning": "semver",
       "currentValueTemplate": "24.9.0",
-      "extractVersionTemplate": "^24\\.9\\.[0-9]+$"
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
@@ -47,9 +45,8 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "nvcr.io/nvidia/gpu-operator",
-      "versioning": "semver",
       "currentValueTemplate": "24.12.0",
-      "extractVersionTemplate": "^24\\.12\\.[0-9]+$"
+      "versioningTemplate": "semver"
     }
   ],
   "packageRules": [
@@ -59,7 +56,8 @@
       "commitMessageTopic": "GPU Operator staging digest",
       "prBodyNotes": [
         "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
-      ]
+      ],
+      "labels": ["needs-testing"]
     },
     {
       "matchPackagePatterns": ["nvcr.io/nvidia/gpu-operator"],
@@ -68,7 +66,8 @@
       "commitMessageTopic": "GPU Operator version",
       "prBodyNotes": [
         "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
-      ]
+      ],
+      "labels": ["needs-testing"]
     }
   ],
   "enabledManagers": ["regex"],
