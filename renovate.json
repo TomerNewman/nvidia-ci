@@ -7,21 +7,24 @@
       "matchStrings": ["gpu_operator_staging_digest:\\s*\"(?<currentDigest>.*?)\""],
       "datasourceTemplate": "docker",
       "registryUrlTemplate": "https://registry.gitlab.com",
-      "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle:main-latest",
+      "packageNameTemplate": "nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
       "depNameTemplate": "nvidia-gpu-operator-staging",
-      "lookupNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
+      "lookupNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle:main-latest",
       "versioningTemplate": "docker",
       "currentValueTemplate": "{{currentDigest}}"
     }
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["digest", "major", "minor", "patch"],
       "matchDepNames": ["nvidia-gpu-operator-staging"],
+      "matchUpdateTypes": ["digest"],
+      "lookupNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle:main-latest",
       "digest": {
         "enabled": true
       },
-      "prBodyNotes": ["/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"]
+      "prBodyNotes": [
+        "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
+      ]
     }
   ],
   "schedule": ["at any time"],
