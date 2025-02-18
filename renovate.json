@@ -1,0 +1,66 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": ["regex"],
+  "regexManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "gpu_operator_staging_digest:\\s*\"(?<currentDigest>sha256:[a-f0-9]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "registry.gitlab.com/nvidia/kubernetes/gpu-operator/staging/gpu-operator-bundle",
+      "currentValueTemplate": "main-latest",
+      "registryUrlTemplate": "https://registry.gitlab.com"
+    },
+    {
+      "description": "GPU Operator version management (24.6-24.12)",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "gpu-24.(?<minor>6|9|12):\\s*\"(?<currentValue>.*?)\""
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://nvcr.io",
+      "packageNameTemplate": "nvidia/gpu-operator",
+      "depNameTemplate": "GPU operator minor version - {{{minor}}}",
+      "versioningTemplate": "regex:^v24\\.{{{minor}}}\\.(?<patch>\\d+)$"
+    },
+    {
+      "description": "OpenShift version management (4.12-4.17)",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "ocp-4.(?<minor>12|13|14|15|16|17):\\s*\"(?<currentValue>.*?)\""
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://quay.io",
+      "packageNameTemplate": "openshift-release-dev/ocp-release",
+      "depNameTemplate": "ocp-{{minor}}",
+      "versioningTemplate": "regex:^4\\.{{{minor}}}\\.(?<patch>\\d+)-x86_64$"
+    }
+  ],
+
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["gpu-operator-bundle"],
+      "commitMessageExtra": "to {{newDigest}}",
+      "commitMessageTopic": "GPU Operator staging digest",
+      "prBodyNotes": [
+        "/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"
+      ]
+    },
+    {
+      "description": "Default rules for all gpu versions",
+      "matchDepPatterns": ["^GPU-Operator-Version-\\d+$"],
+      "prBodyNotes": ["/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"]
+    },
+    {
+      "description": "Default rules for all OCP versions",
+      "matchPackageNames": ["openshift-release-dev/ocp-release"],
+      "matchDepPatterns": ["^ocp-(?<minor>12|13|14|15|16|17)$"],
+      "prBodyNotes": ["/test 4.{{replace 'ocp-' '' depName}}-nvidia-gpu-operator-e2e-latest"]
+    }
+  ],
+  "schedule": ["at any time"],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0
+}
