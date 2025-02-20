@@ -3,6 +3,7 @@
   "enabledManagers": ["regex"],
   "regexManagers": [
     {
+      "description": "GPU Operator bundle image digest management",
       "customType": "regex",
       "fileMatch": ["^versions\\.yaml$"],
       "matchStrings": [
@@ -26,21 +27,33 @@
       "versioningTemplate": "regex:^v24\\.{{{minor}}}\\.(?<patch>\\d+)$"
     },
     {
-      "description": "OpenShift version management (4.12-4.17)",
+      "description": "OpenShift version management (4.12-4.20)",
       "fileMatch": ["^versions\\.yaml$"],
       "matchStrings": [
-        "ocp-4.(?<minor>12|13|14|15|16|17):\\s*\"(?<currentValue>.*?)\""
+        "ocp-4.(?<minor>12|13|14|15|16|17|18|19|20):\\s*\"(?<currentValue>.*?)\""
       ],
       "datasourceTemplate": "docker",
       "registryUrlTemplate": "https://quay.io",
       "packageNameTemplate": "openshift-release-dev/ocp-release",
       "depNameTemplate": "ocp-{{minor}}",
       "versioningTemplate": "regex:^4\\.{{{minor}}}\\.(?<patch>\\d+)-x86_64$"
+    },
+    {
+      "description": "OpenShift rc version management (4.18)",
+      "fileMatch": ["^versions\\.yaml$"],
+      "matchStrings": [
+        "ocp-rc-4.(?<minor>18|19|20):\\s*\"(?<currentValue>.*?)\""
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://quay.io",
+      "packageNameTemplate": "openshift-release-dev/ocp-release",
+      "depNameTemplate": "ocp-rc-{{minor}}",
+      "versioningTemplate": "regex:^4\\.{{{minor}}}\\.0-rc\\.(?<patch>\\d+)-x86_64$"
     }
   ],
-
   "packageRules": [
     {
+      "description": "Rules for all NVIDIA GPU Operator bundle image",
       "matchPackagePatterns": ["gpu-operator-bundle"],
       "commitMessageExtra": "to {{newDigest}}",
       "commitMessageTopic": "GPU Operator staging digest",
@@ -49,14 +62,20 @@
       ]
     },
     {
-      "description": "Default rules for all gpu versions",
+      "description": "Rules for all NVIDIA GPU Operator versions",
       "matchDepPatterns": ["^GPU-Operator-Version-\\d+$"],
       "prBodyNotes": ["/test 4.12-nvidia-gpu-operator-e2e-latest 4.14-nvidia-gpu-operator-e2e-latest 4.15-nvidia-gpu-operator-e2e-latest 4.16-nvidia-gpu-operator-e2e-latest 4.17-nvidia-gpu-operator-e2e-latest"]
     },
     {
-      "description": "Default rules for all OCP versions",
+      "description": "Rules for all OCP versions",
       "matchPackageNames": ["openshift-release-dev/ocp-release"],
-      "matchDepPatterns": ["^ocp-(?<minor>12|13|14|15|16|17)$"],
+      "matchDepPatterns": ["^ocp-(?<minor>12|13|14|15|16|17|18|19|20)$"],
+      "prBodyNotes": ["/test 4.{{replace 'ocp-' '' depName}}-nvidia-gpu-operator-e2e-latest"]
+    },
+    {
+      "description": "Rules for OCP rc version",
+      "matchPackageNames": ["openshift-release-dev/ocp-release"],
+      "matchDepPatterns": ["ocp-rc-(?<minor>18|19|20)"],
       "prBodyNotes": ["/test 4.{{replace 'ocp-' '' depName}}-nvidia-gpu-operator-e2e-latest"]
     }
   ],
