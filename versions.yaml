@@ -1,7 +1,7 @@
 gpu-24.6: "v24.6.2"
 gpu-24.9: "v24.9.2"
 gpu-24.12: "v23.12.0"
-gpu_operator_staging_digest: "sha256:a2d5ce3049990e195fce8b945827cdefdb924353af4b1ab5e9cd57fab54cf75d"
+gpu_operator_staging_digest: "sha256:334ff95e568edf2b9f50b7e5dd418d96e82d39a24358a4748df41c2a2948e8e1"
 ocp-4.12: "4.12.73-x86_64"
 ocp-4.14: "4.14.48-x86_64"
 ocp-4.15: "4.15.46-x86_64"
