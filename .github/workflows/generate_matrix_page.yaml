@@ -78,7 +78,7 @@ jobs:
           else
             python workflows/generate_ci_dashboard.py \
               --merged_data_file "${{ env.DASHBOARD_DATA_FILEPATH }}" \
-              --dashboard_file "${{ env.DASHBOARD_HTML_FILEPATH }}" \
+              --dashboard_file "${{ env.DASHBOARD_HTML_FILEPATH }}"
           fi
 
       - name: Deploy HTML to GitHub Pages
