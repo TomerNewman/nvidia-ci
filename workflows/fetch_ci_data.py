@@ -214,7 +214,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # Update JSON data.
-    baseline_data_path = os.path.join(dashboard_settings.dashboard_output_dir, args.baseline_data_file)
+    baseline_data_path = args.baseline_data_file
     with open(baseline_data_path, "r") as f:
         existing_results: Dict[str, List[Dict[str, Any]]] = json.load(f)
     logger.info(f"Loaded baseline data from: {baseline_data_path} with keys: {list(existing_results.keys())}")
