@@ -6,6 +6,8 @@ import semver
 from typing import Dict, List, Any
 from datetime import datetime, timezone
 from utils import logger
+from settings import dashboard_settings
+
 
 def load_template(filename: str) -> str:
     """
@@ -146,19 +148,17 @@ def build_bundle_info(bundle_results: List[Dict[str, Any]]) -> str:
 def main():
     parser = argparse.ArgumentParser(description="Test Matrix Utility")
     parser.add_argument("--dashboard_file", required=True,
-                        help="Name of the generated HTML dashboard file (inside output_dir)")
+                        help="Name of the generated HTML dashboard file")
     parser.add_argument("--merged_data_file", required=True,
-                        help="Name of the updated (merged) JSON file (inside output_dir)")
-    parser.add_argument("--output_dir", required=True,
-                        help="Directory to store the JSON and HTML files")
+                        help="Name of the updated (merged) JSON file")
     args = parser.parse_args()
-    merged_data_path = os.path.join(args.output_dir, args.merged_data_file)
+    merged_data_path = args.merged_data_file
     with open(merged_data_path, "r") as f:
         ocp_data = json.load(f)
     logger.info(f"Loaded JSON data with keys: {list(ocp_data.keys())} from {merged_data_path}")
 
     html_content = generate_test_matrix(ocp_data)
-    dashboard_path = os.path.join(args.output_dir, args.dashboard_file)
+    dashboard_path = args.dashboard_file
 
     with open(dashboard_path, "w", encoding="utf-8") as f:
         f.write(html_content)

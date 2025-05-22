@@ -12,7 +12,7 @@ import requests
 
 from pydantic import BaseModel
 from utils import logger, GCS_API_BASE_URL, TEST_RESULT_PATH_REGEX, version2suffix
-
+from settings import dashboard_settings
 
 
 
@@ -200,7 +200,7 @@ def merge_and_save_results(
     logger.info(f"Data successfully saved to {file_path}")
 
 # =============================================================================
-# Main Workflow: Update JSON and Generate HTML
+# Main Workflow: Update JSON
 # =============================================================================
 
 def main() -> None:
@@ -208,17 +208,13 @@ def main() -> None:
     parser.add_argument("--pr_number", default="all",
                         help="PR number to process; use 'all' for full history")
     parser.add_argument("--baseline_data_file", required=True,
-                        help="Name of the baseline JSON file (inside output_dir)")
+                        help="Name of the baseline JSON file")
     parser.add_argument("--merged_data_file", required=True,
-                        help="Name of the updated (merged) JSON file (inside output_dir)")
-    parser.add_argument("--dashboard_file", required=True,
-                        help="Name of the generated HTML dashboard file (inside output_dir)")
-    parser.add_argument("--output_dir", required=True,
-                        help="Directory to store the JSON and HTML files")
+                        help="Name of the updated (merged) JSON file")
     args = parser.parse_args()
 
     # Update JSON data.
-    baseline_data_path = os.path.join(args.output_dir, args.baseline_data_file)
+    baseline_data_path = os.path.join(dashboard_settings.dashboard_output_dir, args.baseline_data_file)
     with open(baseline_data_path, "r") as f:
         existing_results: Dict[str, List[Dict[str, Any]]] = json.load(f)
     logger.info(f"Loaded baseline data from: {baseline_data_path} with keys: {list(existing_results.keys())}")
@@ -228,7 +224,7 @@ def main() -> None:
         process_closed_prs(local_results)
     else:
         process_tests_for_pr(args.pr_number, local_results)
-    merge_and_save_results(local_results, args.output_dir, args.merged_data_file, existing_results=existing_results)
+    merge_and_save_results(local_results, dashboard_settings.dashboard_output_dir, args.merged_data_file, existing_results=existing_results)
 
 if __name__ == "__main__":
     main()
