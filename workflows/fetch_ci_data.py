@@ -184,7 +184,7 @@ def merge_and_save_results(
     output_file: str,
     existing_results: Dict[str, List[Dict[str, Any]]] = None
 ) -> None:
-    file_path = os.path.join(output_directory, output_file)
+    file_path = output_file
     logger.info(f"Saving JSON to {file_path}")
     merged_results = existing_results.copy() if existing_results else {}
     for key, new_values in new_results.items():
