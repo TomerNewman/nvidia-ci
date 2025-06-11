@@ -64,6 +64,7 @@ jobs:
 
       - name: Fetch CI Data
         run: |
+          cat "${{ env.DASHBOARD_DATA_FILEPATH }}"
           echo "Processing PR: ${{ steps.determine_pr.outputs.PR_NUMBER }}"
           python workflows/fetch_ci_data.py \
             --pr_number "${{ steps.determine_pr.outputs.PR_NUMBER }}" \
