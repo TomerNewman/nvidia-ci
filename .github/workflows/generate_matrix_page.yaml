@@ -76,6 +76,7 @@ jobs:
       - name: Generate HTML Dashboard (only if JSON changed)
         run: |
           if git diff gh-pages --exit-code "${{ env.DASHBOARD_DATA_FILEPATH }}"; then
+            git diff gh-pages --exit-code "${{ env.DASHBOARD_DATA_FILEPATH }}"
             echo "no changes"
           else
             python workflows/generate_ci_dashboard.py \
