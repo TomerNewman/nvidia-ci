@@ -69,6 +69,7 @@ jobs:
             --pr_number "${{ steps.determine_pr.outputs.PR_NUMBER }}" \
             --baseline_data_filepath "${{ env.DASHBOARD_DATA_FILEPATH }}" \
             --merged_data_filepath "${{ env.DASHBOARD_DATA_FILEPATH }}"
+          cat "${{ env.DASHBOARD_DATA_FILEPATH }}"
 
 
       - name: Generate HTML Dashboard (only if JSON changed)
