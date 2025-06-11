@@ -74,14 +74,15 @@ jobs:
 
 
       - name: Generate HTML Dashboard (only if JSON changed)
-        working-directory: ${{ env.DASHBOARD_OUTPUT_DIR }}
         run: |
+          cd "${{ env.DASHBOARD_OUTPUT_DIR }}"
           if git diff --exit-code gpu_operator_matrix.json; then
             echo "no changes"
           else
+            cd "${{ github.workspace }}"
             python workflows/generate_ci_dashboard.py \
-              --dashboard_data_filepath "gpu_operator_matrix.json" \
-              --dashboard_html_filepath "gpu_operator_matrix.html"
+              --dashboard_data_filepath "${{ env.DASHBOARD_DATA_FILEPATH }}" \
+              --dashboard_html_filepath "${{ env.DASHBOARD_HTML_FILEPATH }}"
           fi
 
       - name: Deploy HTML to GitHub Pages
