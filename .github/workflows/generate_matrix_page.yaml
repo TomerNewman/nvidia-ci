@@ -75,13 +75,31 @@ jobs:
 
       - name: Generate HTML Dashboard (only if JSON changed)
         run: |
+          echo "=== Git status before diff ==="
+          git status
+
+          echo "=== Git diff on file ==="
+          git diff "${{ env.DASHBOARD_DATA_FILEPATH }}"
+
+          echo "=== Git log for file ==="
+          git log -n 1 --pretty=fuller -- "${{ env.DASHBOARD_DATA_FILEPATH }}"
+
+          echo "=== File content (current) ==="
+          cat "${{ env.DASHBOARD_DATA_FILEPATH }}"
+
+          echo "=== File content (committed version) ==="
+          git show HEAD:"${{ env.DASHBOARD_DATA_FILEPATH }}" || echo "File not committed yet."
+
+          echo "=== Running git diff --exit-code ==="
           if git diff --exit-code "${{ env.DASHBOARD_DATA_FILEPATH }}"; then
             echo "no changes"
           else
+            echo "File changed — generating dashboard."
             python workflows/generate_ci_dashboard.py \
               --dashboard_data_filepath "${{ env.DASHBOARD_DATA_FILEPATH }}" \
               --dashboard_html_filepath "${{ env.DASHBOARD_HTML_FILEPATH }}"
           fi
+      
 
       - name: Deploy HTML to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
