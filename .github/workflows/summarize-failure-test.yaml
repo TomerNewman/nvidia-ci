@@ -1,0 +1,47 @@
+name: Test AI Summary Locally
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-summary:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install summarizer dependencies
+        run: pip install -r workflows/summarize-requirements.txt
+
+      - name: Download failed prow log
+        run: |
+          LOG_URL="https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/pr-logs/pull/rh-ecosystem-edge_nvidia-ci/262/pull-ci-rh-ecosystem-edge-nvidia-ci-main-4.19-stable-nvidia-gpu-operator-e2e-master/1953346203395559424/build-log.txt"
+          echo "🔗 Downloading: $LOG_URL"
+          curl -s "$LOG_URL" -o log.txt
+
+      - name: Run summarizer
+        run: |
+          python3 workflows/summarize.py log.txt --model sshleifer/distilbart-cnn-12-6 > summary.txt
+          echo "✅ AI Summary:"
+          cat summary.txt
+
+      - name: Comment on PR in your fork
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('summary.txt', 'utf8');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `🤖 **AI Summary for Failed Job**: \`${context.payload.check_run.name}\`\n\n\`\`\`\n${summary}\n\`\`\`\n[🔗 Full logs](${context.payload.check_run.details_url})`,
+            });
