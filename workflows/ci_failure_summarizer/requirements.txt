@@ -1,0 +1,3 @@
+# CI Failure Summarizer dependencies
+groq>=0.9.0
+requests>=2.31.0

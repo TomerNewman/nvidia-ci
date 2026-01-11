@@ -1,0 +1,193 @@
+name: Summarize CI Failures
+
+on:
+  # Trigger when Prow job status is reported
+  status:
+
+  # TEMPORARY: Remove before merging to upstream!
+  # Allows testing on push to any branch
+  push:
+    paths:
+      - 'workflows/ci_failure_summarizer/**'
+      - '.github/workflows/analyze-ci-failures.yaml'
+
+  # Allow manual triggering for testing or re-analysis
+  workflow_dispatch:
+    inputs:
+      prow_url:
+        description: 'Full Prow URL (e.g., https://prow.ci.openshift.org/view/gs/test-platform-results/pr-logs/pull/...)'
+        required: false
+        type: string
+      pr_number:
+        description: 'PR number (alternative to prow_url)'
+        required: false
+        type: string
+      job_name:
+        description: 'Job name (required if using pr_number)'
+        required: false
+        type: string
+      build_id:
+        description: 'Build ID (required if using pr_number)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: read
+
+jobs:
+  summarize-failure:
+    # Only run for:
+    # 1. Manual dispatch, OR
+    # 2. Status events that are failures AND from nvidia-ci jobs
+    # 3. Push events (for testing - remove before merging!)
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'status' &&
+       github.event.state == 'failure' &&
+       contains(github.event.context, 'nvidia-gpu-operator'))
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install -r workflows/ci_failure_summarizer/requirements.txt
+
+      - name: Parse job info from status event
+        id: parse_status
+        if: github.event_name == 'status'
+        run: |
+          python3 << 'EOF'
+          import re
+          import os
+
+          url = "${{ github.event.target_url }}"
+          context = "${{ github.event.context }}"
+
+          print(f"Status context: {context}")
+          print(f"Target URL: {url}")
+
+          # Parse: .../pr-logs/pull/org_repo/PR/job-name/build-id
+          match = re.search(r'/pr-logs/pull/([^/]+)/(\d+)/([^/]+)/(\d+)', url)
+
+          if match:
+              org_repo, pr_number, job_name, build_id = match.groups()
+              print(f"Parsed: PR={pr_number}, Job={job_name}, Build={build_id}")
+
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write(f"org_repo={org_repo}\n")
+                  f.write(f"pr_number={pr_number}\n")
+                  f.write(f"job_name={job_name}\n")
+                  f.write(f"build_id={build_id}\n")
+                  f.write("parsed=true\n")
+          else:
+              print(f"Could not parse URL: {url}")
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write("parsed=false\n")
+          EOF
+
+      - name: Validate inputs
+        id: validate
+        run: |
+          # Determine which inputs to use
+          if [ "${{ github.event_name }}" == "push" ]; then
+            # TEST MODE: Use a sample Prow URL for testing on push
+            echo "mode=prow_url" >> $GITHUB_OUTPUT
+            echo "prow_url=https://prow.ci.openshift.org/view/gs/test-platform-results/pr-logs/pull/rh-ecosystem-edge_nvidia-ci/406/pull-ci-rh-ecosystem-edge-nvidia-ci-main-4.14-stable-nvidia-gpu-operator-e2e-master/2010211550391963648" >> $GITHUB_OUTPUT
+            echo "test_mode=true" >> $GITHUB_OUTPUT
+            echo "::notice::Running in TEST MODE with sample Prow URL"
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            if [ -n "${{ inputs.prow_url }}" ]; then
+              echo "mode=prow_url" >> $GITHUB_OUTPUT
+              echo "prow_url=${{ inputs.prow_url }}" >> $GITHUB_OUTPUT
+            elif [ -n "${{ inputs.pr_number }}" ] && [ -n "${{ inputs.job_name }}" ] && [ -n "${{ inputs.build_id }}" ]; then
+              echo "mode=manual" >> $GITHUB_OUTPUT
+              echo "pr_number=${{ inputs.pr_number }}" >> $GITHUB_OUTPUT
+              echo "job_name=${{ inputs.job_name }}" >> $GITHUB_OUTPUT
+              echo "build_id=${{ inputs.build_id }}" >> $GITHUB_OUTPUT
+            else
+              echo "::error::For manual dispatch, provide either prow_url OR (pr_number + job_name + build_id)"
+              exit 1
+            fi
+          else
+            if [ "${{ steps.parse_status.outputs.parsed }}" == "true" ]; then
+              echo "mode=status" >> $GITHUB_OUTPUT
+            else
+              echo "::error::Could not parse job info from status event"
+              exit 1
+            fi
+          fi
+
+      - name: Generate AI summary
+        id: summarize
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          # From status event
+          PR_NUMBER: ${{ steps.parse_status.outputs.pr_number }}
+          JOB_NAME: ${{ steps.parse_status.outputs.job_name }}
+          BUILD_ID: ${{ steps.parse_status.outputs.build_id }}
+          ORG_REPO: ${{ steps.parse_status.outputs.org_repo }}
+          # From manual dispatch (prow_url mode)
+          PROW_URL: ${{ steps.validate.outputs.prow_url }}
+        run: |
+          # Override with manual inputs if provided
+          if [ "${{ steps.validate.outputs.mode }}" == "manual" ]; then
+            export PR_NUMBER="${{ steps.validate.outputs.pr_number }}"
+            export JOB_NAME="${{ steps.validate.outputs.job_name }}"
+            export BUILD_ID="${{ steps.validate.outputs.build_id }}"
+          fi
+
+          python -m workflows.ci_failure_summarizer.summarize
+
+      - name: Post PR comment
+        # Skip posting in test mode (push trigger) to avoid errors on forks
+        if: steps.summarize.outputs.summary != '' && steps.validate.outputs.test_mode != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = process.env.SUMMARY;
+            const prNumber = process.env.PR_NUMBER;
+
+            if (!prNumber) {
+              console.log('No PR number available, skipping comment');
+              return;
+            }
+
+            console.log(`Posting summary to PR #${prNumber}`);
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(prNumber),
+              body: summary
+            });
+
+            console.log('Comment posted successfully');
+        env:
+          SUMMARY: ${{ steps.summarize.outputs.summary }}
+          PR_NUMBER: ${{ steps.summarize.outputs.pr_number || steps.parse_status.outputs.pr_number || inputs.pr_number }}
+
+      - name: Print summary (test mode)
+        if: steps.validate.outputs.test_mode == 'true' && steps.summarize.outputs.summary != ''
+        run: |
+          echo "=============================================="
+          echo "🧪 TEST MODE - Summary that would be posted:"
+          echo "=============================================="
+          echo "${{ steps.summarize.outputs.summary }}"
+          echo "=============================================="
+
+      - name: Report error
+        if: failure() && steps.summarize.outputs.error != ''
+        run: |
+          echo "::error::${{ steps.summarize.outputs.error }}"
